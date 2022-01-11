@@ -12,6 +12,9 @@ repositories {
 dependencies {
     implementation 'org.springframework:spring-websocket:5.3.14'
     implementation 'org.springframework:spring-messaging:5.3.14'
+    implementation 'org.springframework.boot:spring-boot-starter:2.6.2'
+    implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client:2.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket:2.6.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
