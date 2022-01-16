@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class SubscribeRequestPayload {
@@ -22,40 +21,38 @@ public class SubscribeRequestPayload {
     }
 
     public String toJson() {
-        String currencyPairsToString = convertCurrencyPairsToString();
-        String subscriptionSetting = convertSettingsToString();
-
         return """
-                {
-                    "event": "EVENT",
-                    "pair": [
-                      "BTC/USD",
-                      "ETH/USD"
-                    ],
-                    "subscription": {
-                      "name": "book"
-                    }
-                }
-                """;
+            {
+                "event": "%s",
+                "pair": %s,
+                "subscription": %s
+            }""".formatted(
+                EVENT_NAME,
+                convertCurrencyPairsToJsonString(),
+                convertSettingsToJsonString()
+            );
     }
 
-    // I know I can use json libraries for the methods bellow ....
-    private String convertCurrencyPairsToString() {
-        Set<String> currencyPairsWithQuotes = currencyPairs.stream().map((String pair) -> {
-            return "\"" + pair + "\"";
-        }).collect(Collectors.toSet());
+    // I know that I could use third-party library (google/gson or other) for the methods bellow.
+    // I just wanted to play with Stream API and Strings
+    private String convertCurrencyPairsToJsonString() {
+        Set<String> currencyPairsWithQuotes = currencyPairs
+                .stream()
+                .map((String pair) -> "\"" + pair + "\"")
+                .collect(Collectors.toSet());
 
         return "[" + String.join(", ", currencyPairsWithQuotes) + "]";
     }
 
-    private String convertSettingsToString() {
-        String settingsString = "";
+    private String convertSettingsToJsonString() {
+        List<String> settingsStrings = subscriptionSettings
+                .entrySet()
+                .stream()
+                .map((e) -> "\"" + e.getKey() + "\": " + "\"" + e.getValue() + "\"")
+                .collect(Collectors.toList());
 
-        settingsString += "{";
-        for (Map.Entry entry : subscriptionSettings.entrySet()) {
-            settingsString += "\"" + entry.getKey() + "\"";
-        }
-
-        return settingsString;
+        return """
+                {%s}
+                """.formatted(String.join(", ", String.join(", ", settingsStrings)));
     }
 }
