@@ -2,10 +2,10 @@ import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Main {
     private static final int TIMER_PERIOD = 2000; // milliseconds
@@ -22,31 +22,37 @@ public class Main {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-            if (KrakenOrderBookDataUtil.getInstance().getOrderBookData().isEmpty()) {
-                return;
-            }
+                if (KrakenOrderBookDataUtil.getInstance().getOrderBookData().isEmpty()) {
+                    return;
+                }
 
-            KrakenOrderBookDataUtil.getInstance().getOrderBookData().forEach((currencyPairs, data) -> {
-                System.out.println("<------------------------------------>");
-                System.out.println("Currency pairs: " + currencyPairs);
+                KrakenOrderBookDataUtil.getInstance().getOrderBookData().forEach((currencyPairs, data) -> {
+                    System.out.println("<------------------------------------>");
+                    System.out.println("Currency pairs: " + currencyPairs);
 
-                HashMap<KrakenOrderBookEntryType, ArrayList<KrakenOrderBookEntry>> orderBookEntryData = (HashMap) data;
-                orderBookEntryData.forEach((entryType, orderBookEntries) -> {
-                    System.out.println(entryType.toString().toLowerCase() + "s"); // It's hacky and I know it (music)
+                    HashMap<KrakenOrderBookEntryType, ArrayList<KrakenOrderBookEntry>> orderBookEntryData = (HashMap) data;
+                    orderBookEntryData.forEach((entryType, orderBookEntries) -> {
+                        System.out.println(entryType.toString() + "s:");
 
-                    orderBookEntries.forEach((entry) -> System.out.println(entry));
+                        Collections.sort(orderBookEntries, new OrderBookEntryComparator());
 
-                    String best = entryType == KrakenOrderBookEntryType.ASK
-                            ? orderBookEntries.get(0).toString()
-                            : orderBookEntries.get(orderBookEntries.size() - 1).toString();
+                        orderBookEntries.forEach((entry) -> System.out.println(entry));
 
-                    System.out.println("Best " + entryType.toString() + ": " + best);
+                        String best = entryType == KrakenOrderBookEntryType.BID
+                                ? orderBookEntries.get(0).toString()
+                                : orderBookEntries.get(orderBookEntries.size() - 1).toString();
+
+                        System.out.println("Best " + entryType.toString() + ": " + best + "\n");
+                    });
+
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    LocalDateTime now = LocalDateTime.now();
+                    System.out.println(formatter.format(now));
+
+                    System.out.println(">------------------------------------<");
                 });
 
-                System.out.println(">------------------------------------<");
-            });
-
-            KrakenOrderBookDataUtil.getInstance().clearOrderBookData();
+                KrakenOrderBookDataUtil.getInstance().clearOrderBookData();
             }
         }, 0, TIMER_PERIOD);
     }

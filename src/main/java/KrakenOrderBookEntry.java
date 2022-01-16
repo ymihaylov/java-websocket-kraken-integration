@@ -24,6 +24,10 @@ public class KrakenOrderBookEntry {
         this.time = time;
     }
 
+    public Double getPrice() {
+        return price;
+    }
+
     @Override
     public String toString() {
         return "[ " + price + ", " + amount + " ]";
