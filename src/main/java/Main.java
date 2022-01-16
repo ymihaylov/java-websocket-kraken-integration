@@ -5,7 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
-    private static final int TIMER_PERIOD = 5000; // milliseconds
+    private static final int TIMER_PERIOD = 2000; // milliseconds
     private static final String KRAKEN_URL = "ws://ws.kraken.com";
 
     private static WebSocketConnectionManager krakenWebSocketConnectionManager;
@@ -20,10 +20,11 @@ public class Main {
             @Override
             public void run() {
                 System.out.println("Here");
+                if ( ! KrakenOrderBookDataUtil.getInstance().getOrderBookData().isEmpty()) {
+                    System.out.println("IMAAAAAA");
+                }
             }
         }, 0, TIMER_PERIOD);
-
-//        new Scanner(System.in).nextLine();
     }
 
     private static WebSocketConnectionManager getKrakenWebSocketConnectionManager()

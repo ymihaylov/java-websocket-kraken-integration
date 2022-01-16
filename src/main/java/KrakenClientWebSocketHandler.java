@@ -5,8 +5,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.swing.text.html.Option;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -31,7 +29,7 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
-//        System.out.println("Client received an message: " + message);
+        // System.out.println("Client received an message: " + message);
 
         JSONArray payloadJsonArray;
         try {
@@ -46,8 +44,13 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
         String currencyPair = payloadJsonArray.getString(3);
 
         // I know, I am skipping the first *combined* call from WebSocket server with the latest asks and bids. ;[
-        String orderBookDataKey = getOrderBookDataKey(orderBookData).get(); // "a" or "b"
-        KrakenOrderBookEntryType orderBookEntryType = KrakenOrderBookEntryType.getOrderBookEntryType(orderBookDataKey);
+        Optional<String> optionalOrderBookDataKey = getOrderBookDataKey(orderBookData); // "a" or "b"
+        if (optionalOrderBookDataKey.isEmpty()) {
+            return;
+        }
+
+        String orderBookDataKey = optionalOrderBookDataKey.get();
+        KrakenOrderBookEntryType orderBookEntryType = KrakenOrderBookEntryType.getOrderBookEntryTypeByKey(orderBookDataKey);
 
         ArrayList<KrakenOrderBookEntry> newOrderBookEntries = prepareNewOrderBookEntries(
             currencyPair,
@@ -56,8 +59,6 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
         );
 
         KrakenOrderBookDataUtil.getInstance().putOrderBookData(currencyPair, orderBookEntryType, newOrderBookEntries);
-
-        System.out.println("Here");
 
         // @TODO Validate payload
         // @TODO Handle first request with bs and as

@@ -21,6 +21,6 @@ public class KrakenOrderBookEntry {
         this.currencyPair = currencyPair;
         this.orderBookEntryType = orderBookEntryType;
 
-        this.time = System.currentTimeMillis();
+        this.time = time;
     }
 }
