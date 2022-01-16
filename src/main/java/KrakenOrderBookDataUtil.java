@@ -21,8 +21,10 @@ public class KrakenOrderBookDataUtil {
         }
 
         orderBookData.get(currencyPair).get(type).addAll(orderBookEntries);
+    }
 
-        System.out.println("here");
+    public void clearOrderBookData() {
+        orderBookData.clear();
     }
 
     public HashMap getOrderBookData() {

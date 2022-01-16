@@ -23,4 +23,9 @@ public class KrakenOrderBookEntry {
 
         this.time = time;
     }
+
+    @Override
+    public String toString() {
+        return "[ " + price + ", " + amount + " ]";
+    }
 }
