@@ -1,17 +1,21 @@
+package orderbook;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
-public class KrakenOrderBookDataUtil {
-    private static KrakenOrderBookDataUtil instance;
+public class OrderBookDataUtil {
+    private static OrderBookDataUtil instance;
 
     // Is it too complex structure?
-    private HashMap<String, HashMap<KrakenOrderBookEntryType, ArrayList<KrakenOrderBookEntry>>> orderBookData;
+    // XBT/USD -> (BID -> (Entry1, Entry2, ...))
+    private Map<String, HashMap<OrderBookEntryType, ArrayList<OrderBookEntry>>> orderBookData;
 
-    private KrakenOrderBookDataUtil() {
-        orderBookData = new HashMap<String, HashMap<KrakenOrderBookEntryType, ArrayList<KrakenOrderBookEntry>>>();
+    private OrderBookDataUtil() {
+        orderBookData = new HashMap<String, HashMap<OrderBookEntryType, ArrayList<OrderBookEntry>>>();
     }
 
-    public void putOrderBookData(String currencyPair, KrakenOrderBookEntryType type, ArrayList orderBookEntries) {
+    public void putOrderBookData(String currencyPair, OrderBookEntryType type, ArrayList orderBookEntries) {
         if ( ! orderBookData.containsKey(currencyPair)) {
             orderBookData.put(currencyPair, new HashMap<>());
         }
@@ -27,13 +31,13 @@ public class KrakenOrderBookDataUtil {
         orderBookData.clear();
     }
 
-    public HashMap getOrderBookData() {
+    public Map getOrderBookData() {
         return orderBookData;
     }
 
-    public static KrakenOrderBookDataUtil getInstance() {
+    public static OrderBookDataUtil getInstance() {
         if (instance == null) {
-            instance = new KrakenOrderBookDataUtil();
+            instance = new OrderBookDataUtil();
         }
 
         return instance;

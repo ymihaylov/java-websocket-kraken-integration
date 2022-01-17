@@ -1,12 +1,14 @@
-public enum KrakenOrderBookEntryType {
+package orderbook;
+
+public enum OrderBookEntryType {
     BID,
     ASK;
 
-    public static KrakenOrderBookEntryType getOrderBookEntryTypeByKey(String orderBookDataKey) {
+    public static OrderBookEntryType getOrderBookEntryTypeByKey(String orderBookDataKey) {
         if (orderBookDataKey == "a" || orderBookDataKey == "as") {
-            return KrakenOrderBookEntryType.ASK;
+            return OrderBookEntryType.ASK;
         } else if (orderBookDataKey == "b" || orderBookDataKey == "bid") {
-            return KrakenOrderBookEntryType.BID;
+            return OrderBookEntryType.BID;
         }
 
         throw new RuntimeException("Invalid orderBookDataKey");

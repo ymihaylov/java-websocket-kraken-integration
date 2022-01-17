@@ -1,3 +1,8 @@
+package kraken_websocket_client;
+
+import orderbook.OrderBookEntry;
+import orderbook.OrderBookEntryType;
+import orderbook.OrderBookDataUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.web.socket.CloseStatus;
@@ -15,11 +20,11 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Client connection opened!");
 
-        SubscribeRequestPayload subscribeRequestPayload = prepareSubscribeRequestPayload();
-        TextMessage message = new TextMessage(subscribeRequestPayload.toJson());
+        KrakenSubscribeRequestPayload krakenSubscribeRequestPayload = prepareSubscribeRequestPayload();
+        TextMessage subscribeMessage = new TextMessage(krakenSubscribeRequestPayload.toJson());
 
-        System.out.println("Client sends: " + message);
-        session.sendMessage(message);
+        System.out.println("Client sends: " + subscribeMessage);
+        session.sendMessage(subscribeMessage);
     }
 
     @Override
@@ -50,19 +55,16 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
         }
 
         String orderBookDataKey = optionalOrderBookDataKey.get();
-        KrakenOrderBookEntryType orderBookEntryType = KrakenOrderBookEntryType.getOrderBookEntryTypeByKey(orderBookDataKey);
 
-        ArrayList<KrakenOrderBookEntry> newOrderBookEntries = prepareNewOrderBookEntries(
+        OrderBookEntryType orderBookEntryType = OrderBookEntryType.getOrderBookEntryTypeByKey(orderBookDataKey);
+
+        ArrayList<OrderBookEntry> newOrderBookEntries = prepareNewOrderBookEntries(
             currencyPair,
             orderBookEntryType,
             (ArrayList) orderBookData.get(orderBookDataKey)
         );
 
-        KrakenOrderBookDataUtil.getInstance().putOrderBookData(currencyPair, orderBookEntryType, newOrderBookEntries);
-
-        // @TODO Validate payload
-        // @TODO Handle first request with bs and as
-//        KrakenOrderBookDataUtil.getInstance().incrementInteger();
+        OrderBookDataUtil.getInstance().putOrderBookData(currencyPair, orderBookEntryType, newOrderBookEntries);
     }
 
     @Override
@@ -70,18 +72,18 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
         System.out.println("Client transport error: {}" + exception.getMessage());
     }
 
-    private SubscribeRequestPayload prepareSubscribeRequestPayload() {
-        SubscribeRequestPayload subscribeRequestPayload = new SubscribeRequestPayload();
+    private KrakenSubscribeRequestPayload prepareSubscribeRequestPayload() {
+        KrakenSubscribeRequestPayload krakenSubscribeRequestPayload = new KrakenSubscribeRequestPayload();
 
         // Pairs and subscription settings should be stored in config files for example (should be configurable).
         // Also, they should have validation before setting them in payload object etc.
         // but for the purposes of this task I think the following way is okayish.
-        subscribeRequestPayload.addCurrencyPair("BTC/USD");
-        subscribeRequestPayload.addCurrencyPair("ETH/USD");
+        krakenSubscribeRequestPayload.addCurrencyPair("BTC/USD");
+        krakenSubscribeRequestPayload.addCurrencyPair("ETH/USD");
 
-        subscribeRequestPayload.addSubscriptionSetting("name", "book");
+        krakenSubscribeRequestPayload.addSubscriptionSetting("name", "book");
 
-        return subscribeRequestPayload;
+        return krakenSubscribeRequestPayload;
     }
 
     private Optional<String> getOrderBookDataKey(Map orderBookData)
@@ -95,8 +97,8 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
             .findFirst();
     }
 
-    private ArrayList prepareNewOrderBookEntries(String currencyPair, KrakenOrderBookEntryType entryType, ArrayList entriesByPayload) {
-        ArrayList<KrakenOrderBookEntry> newOrderBookEntries = new ArrayList();
+    private ArrayList prepareNewOrderBookEntries(String currencyPair, OrderBookEntryType orderBookEntryType, ArrayList entriesByPayload) {
+        ArrayList<OrderBookEntry> newOrderBookEntries = new ArrayList();
         
         entriesByPayload.stream().forEach((entry) -> {
             String priceStr = (String) ((ArrayList) entry).get(0);
@@ -105,7 +107,7 @@ public class KrakenClientWebSocketHandler extends TextWebSocketHandler {
             Double price = Double.parseDouble(priceStr);
             Double amount = Double.parseDouble(amountStr);
 
-            KrakenOrderBookEntry orderBookEntry = new KrakenOrderBookEntry(price, amount, currencyPair, entryType);
+            OrderBookEntry orderBookEntry = new OrderBookEntry(price, amount, currencyPair, orderBookEntryType);
 
             newOrderBookEntries.add(orderBookEntry);
         });

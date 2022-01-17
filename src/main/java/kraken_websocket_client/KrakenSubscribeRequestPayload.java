@@ -1,13 +1,15 @@
+package kraken_websocket_client;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SubscribeRequestPayload {
+public class KrakenSubscribeRequestPayload {
     private static final String EVENT_NAME = "subscribe";
 
     private Set<String> currencyPairs;
     private Map<String, String> subscriptionSettings;
 
-    public SubscribeRequestPayload() {
+    public KrakenSubscribeRequestPayload() {
         currencyPairs = new HashSet<>();
         subscriptionSettings = new HashMap<>();
     }

@@ -1,12 +1,14 @@
-public class KrakenOrderBookEntry {
+package orderbook;
+
+public class OrderBookEntry {
     private Double price;
     private Double amount;
     private Long time;
 
     private String currencyPair;
-    private KrakenOrderBookEntryType orderBookEntryType;
+    private OrderBookEntryType orderBookEntryType;
 
-    public KrakenOrderBookEntry(Double price, Double amount, String currencyPair, KrakenOrderBookEntryType orderBookEntryType) {
+    public OrderBookEntry(Double price, Double amount, String currencyPair, OrderBookEntryType orderBookEntryType) {
         this.price = price;
         this.amount = amount;
         this.currencyPair = currencyPair;
@@ -15,7 +17,7 @@ public class KrakenOrderBookEntry {
         this.time = System.currentTimeMillis();
     }
 
-    public KrakenOrderBookEntry(Double price, Double amount, String currencyPair, KrakenOrderBookEntryType orderBookEntryType, Long time) {
+    public OrderBookEntry(Double price, Double amount, String currencyPair, OrderBookEntryType orderBookEntryType, Long time) {
         this.price = price;
         this.amount = amount;
         this.currencyPair = currencyPair;
